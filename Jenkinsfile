@@ -1,11 +1,18 @@
 node {
     docker.image('node:16-buster-slim').withRun('-p 49000:49000') {
         stage('Build') {
-        sh 'npm install'
+            sh 'mvn -B -DskipTests clean package'
         }
 
         stage('Test') {
-            sh './jenkins/scripts/test.sh'
+            steps {
+                sh 'mvn test' 
+            }
+            post {
+                always {
+                    junit 'target/surefire-reports/*.xml' 
+                }
+            }
         }
     }       
 }
